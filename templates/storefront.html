@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samnish Clothing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="announce">Islandwide delivery · Rs 350 flat rate · Cash on delivery available</div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-mark">&#9733;</span>
+      <span class="logo-word">SAMNISH</span>
+    </div>
+    <nav class="nav-links">
+      <a href="#shop">Shop</a>
+      <a href="#tshirts">T-Shirts</a>
+      <a href="#frocks">Frocks</a>
+      <a href="#about">About</a>
+    </nav>
+    <button class="cart-btn" id="cartBtn" aria-label="Open cart">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M6 8h12l-1 12H7L6 8z"/>
+        <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
+      </svg>
+      <span class="cart-count" id="cartCount">{{ cart_count }}</span>
+    </button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-media">
+    <img src="{{ url_for('static', filename='images/pug-life-tee.jpg') }}" alt="Samnish Clothing models wearing Pug Life tees">
+  </div>
+  <div class="hero-copy">
+    <p class="hero-eyebrow">Samnish Clothing</p>
+    <h1 class="hero-title">Big prints.<br>Bigger comfort.</h1>
+    <p class="hero-sub">Oversized tees and easy frocks, printed with a sense of humor.</p>
+    <a href="#shop" class="hero-cta">Shop the drop</a>
+  </div>
+</section>
+
+<section class="promo-strip">
+  <div class="promo-tile">
+    <img src="{{ url_for('static', filename='images/ruby-lips-tee-2.jpg') }}" alt="Ruby Lips back-print tee">
+    <div class="promo-label">Graphic Tees</div>
+  </div>
+  <div class="promo-tile">
+    <img src="{{ url_for('static', filename='images/leaf-dress-meadow.jpg') }}" alt="Leaf print wrap frock">
+    <div class="promo-label">Frocks Edit</div>
+  </div>
+  <div class="promo-tile">
+    <img src="{{ url_for('static', filename='images/samnish-logo-tee.jpg') }}" alt="Samnish classic logo tee">
+    <div class="promo-label">Everyday Basics</div>
+  </div>
+</section>
+
+<section class="shop" id="shop">
+  <aside class="filters">
+    <h2 class="filters-title">Filter</h2>
+
+    <div class="filter-group">
+      <h3>Category</h3>
+      <button class="filter-btn is-active" data-filter-type="category" data-value="all">All</button>
+      {% for key, label in categories.items() %}
+      <button class="filter-btn" data-filter-type="category" data-value="{{ key }}" id="{{ key }}">{{ label }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="filter-group">
+      <h3>Fit</h3>
+      <button class="filter-btn is-active" data-filter-type="gender" data-value="all">All</button>
+      {% for g in genders %}
+      <button class="filter-btn" data-filter-type="gender" data-value="{{ g }}">{{ g }}</button>
+      {% endfor %}
+    </div>
+  </aside>
+
+  <div class="product-grid" id="productGrid">
+    {% for p in products %}
+    <article class="product-card" data-category="{{ p.category }}" data-gender="{{ p.gender }}" data-product-id="{{ p.id }}">
+      <div class="product-media">
+        {% for img in p.images %}
+        <img src="{{ url_for('static', filename='images/' + img) }}"
+             alt="{{ p.name }}"
+             class="product-photo {{ 'is-active' if loop.first else '' }}"
+             data-index="{{ loop.index0 }}">
+        {% endfor %}
+        {% if p.images|length > 1 %}
+        <div class="photo-dots">
+          {% for img in p.images %}
+          <span class="dot {{ 'is-active' if loop.first else '' }}" data-index="{{ loop.index0 }}"></span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <div class="product-body">
+        <p class="product-gender">{{ p.gender }}{% if p.colors %} · {{ p.colors|join(' / ') }}{% endif %}</p>
+        <h3 class="product-name">{{ p.name }}</h3>
+        <div class="product-row">
+          <span class="product-price">Rs {{ "{:,}".format(p.price) }}</span>
+          <button class="add-btn">Add to bag</button>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="brand-story" id="about">
+  <div class="story-inner">
+    <p class="story-eyebrow">Who we are</p>
+    <h2>Not just another tee brand.</h2>
+    <p class="story-text">
+      Samnish Clothing started with a simple idea — clothes should be comfortable enough to
+      live in and fun enough to talk about. Every print is designed in-house, every tee is
+      cut oversized on purpose, and every drop is small enough that you won't see your outfit
+      coming back at you.
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col">
+      <div class="logo footer-logo">
+        <span class="logo-mark">&#9733;</span>
+        <span class="logo-word">SAMNISH</span>
+      </div>
+      <p class="footer-blurb">Big prints. Bigger comfort. A small Sri Lankan clothing label.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="#shop">T-Shirts</a>
+      <a href="#shop">Frocks</a>
+      <a href="#shop">New In</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">Shipping</a>
+      <a href="#">Returns</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <div class="footer-col newsletter">
+      <h4>Stay in the loop</h4>
+      <div class="newsletter-row">
+        <input type="email" placeholder="Your email" disabled>
+        <button disabled>Join</button>
+      </div>
+      <p class="footer-note">Demo store — sign-up not active.</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 Samnish Clothing. Assignment demo store — no real payments.</span>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<aside class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2>Your bag</h2>
+    <button class="cart-close" id="cartClose" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <p class="cart-empty" id="cartEmpty">Your bag is empty.</p>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span>Total</span>
+      <span id="cartTotal">Rs 0</span>
+    </div>
+    <button class="checkout-btn" disabled>Checkout (demo only)</button>
+    <button class="clear-btn" id="clearBtn">Clear bag</button>
+  </div>
+</aside>
+
+<div class="toast-layer" id="toastLayer"></div>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
