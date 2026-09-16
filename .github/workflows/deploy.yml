@@ -1,0 +1,61 @@
+name: CI/CD Pipeline - Samnish Clothing
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        shell: cmd
+        run: pip install -r requirements.txt
+
+      - name: Test app imports correctly
+        shell: cmd
+        run: python -c "import app; print('App imports OK')"
+
+      - name: Build Docker image
+        shell: cmd
+        run: docker build -t %DOCKERHUB_USERNAME%/samnish-clothing:latest .
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Log in to Docker Hub
+        shell: cmd
+        run: echo %DOCKERHUB_TOKEN%| docker login -u %DOCKERHUB_USERNAME% --password-stdin
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push image to Docker Hub
+        shell: cmd
+        run: docker push %DOCKERHUB_USERNAME%/samnish-clothing:latest
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Stop old container (if running)
+        shell: cmd
+        continue-on-error: true
+        run: docker stop samnish-live
+
+      - name: Remove old container (if exists)
+        shell: cmd
+        continue-on-error: true
+        run: docker rm samnish-live
+
+      - name: Deploy to local machine
+        shell: cmd
+        run: docker run -d --name samnish-live -p 5000:5000 %DOCKERHUB_USERNAME%/samnish-clothing:latest
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
